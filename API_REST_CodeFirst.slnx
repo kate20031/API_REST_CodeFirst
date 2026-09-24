@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="API_REST_CodeFirst.Tests/API_REST_CodeFirst.Tests.csproj" Id="8c2a6424-8caa-4a89-bb05-b5ccd7ef3f40" />
   <Project Path="API_REST_CodeFirst/API_REST_CodeFirst.csproj" />
 </Solution>
