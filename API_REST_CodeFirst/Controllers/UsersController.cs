@@ -51,5 +51,25 @@ namespace API_REST_CodeFirst.Controllers
 
             return user;
         }
+
+
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<User>> PostUser(User user)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(
+                nameof(GetUtilisateurById),
+                new { id = user.UserId },
+                user);
+        }
     }
 }
