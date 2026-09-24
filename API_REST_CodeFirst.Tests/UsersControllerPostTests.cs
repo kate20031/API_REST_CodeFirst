@@ -37,5 +37,23 @@ namespace API_REST_CodeFirst.Tests
             Assert.Equal(userToTest.Name, userFromDatabase.Name);
             Assert.Equal(userToTest.FirstName, userFromDatabase.FirstName);
         }
+
+        [Fact]
+        public void PostUser_InvalidModel_ReturnsBadRequest()
+        {
+            var userToTest = new User
+            {
+                Name = "Test1",
+                FirstName = "User",
+                Mail = "invalfid-email",
+                Pwd = "password12355"
+            };
+
+            _controller.ModelState.AddModelError("Mail", "Invalid email address");
+
+            var result = _controller.PostUser(userToTest).Result;
+
+            Assert.IsType<BadRequestObjectResult>(result.Result);
+        }
     }
 }
