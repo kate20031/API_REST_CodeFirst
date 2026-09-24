@@ -17,14 +17,18 @@ namespace API_REST_CodeFirst.Models.EntityFramework
         [Column("utl_prenom", TypeName = "varchar(50)")]
         public string? FirstName { get;  set; }
 
+
+        [RegularExpression(@"^0[1-9][0-9]{8}$")]
         [Column("utl_mobile", TypeName = "char(10)")]
-        public  string? Mobile { get; set; }
+        public string? Mobile { get; set; }
 
         [Required]
+        [EmailAddress]
         [Column("utl_mail", TypeName = "varchar(100)")]
         public string Mail { get; set; } = null!;
 
         [Required]
+        [StringLength(64)]
         [Column("utl_pwd", TypeName = "varchar(64)")]
         public string Pwd { get; set; } = null!;
 
