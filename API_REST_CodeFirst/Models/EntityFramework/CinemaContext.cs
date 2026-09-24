@@ -4,17 +4,14 @@ namespace API_REST_CodeFirst.Models.EntityFramework
 {
     public class CinemaContext : DbContext
     {
-        public DbSet<Movie> Movies { get; set; }
-        public DbSet<User> Users { get; set; }
-        public DbSet<Rating> Ratings { get; set; }
-
-        protected override void OnConfiguring(
-            DbContextOptionsBuilder optionsBuilder)
+        public CinemaContext(DbContextOptions<CinemaContext> options)
+            : base(options)
         {
-            optionsBuilder.UseNpgsql(
-                "Host=localhost;Port=5432;Database=cinema;Username=postgres;Password=postgres"
-            );
         }
+
+        public DbSet<Movie> Movies { get; set; } = null!;
+        public DbSet<User> Users { get; set; } = null!;
+        public DbSet<Rating> Ratings { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -1,4 +1,12 @@
+using API_REST_CodeFirst.Models.EntityFramework;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<CinemaContext>(options =>
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("CinemaConnection")
+    ));
 
 // Add services to the container.
 
