@@ -9,9 +9,6 @@ namespace API_REST_CodeFirst.Models.DataManager
     {
         private readonly CinemaContext _context;
 
-        public UserManager()
-        {
-        }
 
         public UserManager(CinemaContext context)
         {
