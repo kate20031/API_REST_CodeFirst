@@ -6,16 +6,16 @@ namespace API_REST_CodeFirst.Tests
     public class UsersControllerDeleteTests : TestBase
     {
         [Fact]
-        public void DeleteUser_ExistingUser_DeletesUser()
+        public async Task DeleteUser_ExistingUser_DeletesUser()
         {
             var user = new User
             {
                 Name = "DeleteTest",
-                FirstName = "User",
+                FirstName = "User5",
                 Mail = $"delete-test-{Guid.NewGuid()}@example.com",
-                Pwd = "password123",
+                Pwd = "paffzef",
                 Mobile = "0612345678",
-                Street = "Test Street",
+                Street = "Test  Street",
                 Postcode = "74000",
                 City = "Annecy",
                 Country = "France"
@@ -26,7 +26,7 @@ namespace API_REST_CodeFirst.Tests
 
             var userId = user.UserId;
 
-            var result = _controller.DeleteUser(userId).Result;
+            var result = await _controller.DeleteUser(userId);
 
             Assert.IsType<NoContentResult>(result);
 

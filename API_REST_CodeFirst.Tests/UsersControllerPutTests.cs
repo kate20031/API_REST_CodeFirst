@@ -6,7 +6,7 @@ namespace API_REST_CodeFirst.Tests
     public class UsersControllerPutTests : TestBase
     {
         [Fact]
-        public void PutUser_ValidUser_UpdatesUser()
+        public async Task PutUser_ValidUser_UpdatesUser()
         {
             var originalEmail = $"put-test-{Guid.NewGuid()}@example.com";
 
@@ -32,7 +32,8 @@ namespace API_REST_CodeFirst.Tests
             user.FirstName = "UpdatedFirstName";
             user.Mail = $"put-updated-{Guid.NewGuid()}@example.com";
             user.Street = "Updated Street";
-            var result = _controller.PutUser(userId, user).Result;
+
+            var result = await _controller.PutUser(userId, user);
 
             Assert.IsType<NoContentResult>(result);
 

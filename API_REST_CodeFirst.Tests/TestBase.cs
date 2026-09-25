@@ -1,6 +1,7 @@
 ﻿using API_REST_CodeFirst.Controllers;
+using API_REST_CodeFirst.Models.DataManager;
 using API_REST_CodeFirst.Models.EntityFramework;
-using API_REST_CodeFirst.Repositories;
+using API_REST_CodeFirst.Models.Repository;
 using Microsoft.EntityFrameworkCore;
 
 namespace API_REST_CodeFirst.Tests
@@ -8,7 +9,7 @@ namespace API_REST_CodeFirst.Tests
     public class TestBase
     {
         protected readonly CinemaContext _context;
-        protected readonly IUserRepository _repository;
+        protected readonly IDataRepository<User> _dataRepository;
         protected readonly UsersController _controller;
 
         public TestBase()
@@ -20,8 +21,8 @@ namespace API_REST_CodeFirst.Tests
 
             _context = new CinemaContext(options);
 
-            _repository = new UserRepository(_context);
-            _controller = new UsersController(_repository);
+            _dataRepository = new UserManager(_context);
+            _controller = new UsersController(_dataRepository);
         }
     }
 }

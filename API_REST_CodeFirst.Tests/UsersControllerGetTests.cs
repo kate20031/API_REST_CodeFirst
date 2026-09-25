@@ -6,10 +6,11 @@ namespace API_REST_CodeFirst.Tests
     public class UsersControllerGetTests : TestBase
     {
         [Fact]
-        public void GetUsers_ReturnsAllUsers()
+        public async Task GetUsers_ReturnsAllUsers()
         {
             var expectedUsers = _context.Users.ToList();
-            var result = _controller.GetUsers().Result;
+
+            var result = await _controller.GetUsers();
 
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
             var actualUsers = Assert.IsAssignableFrom<IEnumerable<User>>(okResult.Value);
@@ -29,13 +30,12 @@ namespace API_REST_CodeFirst.Tests
         }
 
         [Fact]
-        public void GetUtilisateurById_ExistingUser_ReturnsUser()
+        public async Task GetUtilisateurById_ExistingUser_ReturnsUser()
         {
             var expectedUser = _context.Users.First();
 
-            var result = _controller
-                .GetUtilisateurById(expectedUser.UserId)
-                .Result;
+            var result = await _controller
+                .GetUtilisateurById(expectedUser.UserId);
 
             Assert.NotNull(result.Value);
             Assert.Equal(expectedUser.UserId, result.Value.UserId);
@@ -43,7 +43,7 @@ namespace API_REST_CodeFirst.Tests
         }
 
         [Fact]
-        public void GetUtilisateurById_NonExistingUser_ReturnsNotFound()
+        public async Task GetUtilisateurById_NonExistingUser_ReturnsNotFound()
         {
             var existingIds = _context.Users
                 .Select(u => u.UserId)
@@ -53,21 +53,19 @@ namespace API_REST_CodeFirst.Tests
                 ? 999999
                 : existingIds.Max() + 1;
 
-            var result = _controller
-                .GetUtilisateurById(nonExistingId)
-                .Result;
+            var result = await _controller
+                .GetUtilisateurById(nonExistingId);
 
             Assert.IsType<NotFoundResult>(result.Result);
         }
 
         [Fact]
-        public void GetUserByEmail_ExistingUser_ReturnsUser()
+        public async Task GetUserByEmail_ExistingUser_ReturnsUser()
         {
             var expectedUser = _context.Users.First();
 
-            var result = _controller
-                .GetUserByEmail(expectedUser.Mail)
-                .Result;
+            var result = await _controller
+                .GetUserByEmail(expectedUser.Mail);
 
             Assert.NotNull(result.Value);
             Assert.Equal(expectedUser.UserId, result.Value.UserId);
@@ -75,14 +73,13 @@ namespace API_REST_CodeFirst.Tests
         }
 
         [Fact]
-        public void GetUserByEmail_NonExistingUser_ReturnsNotFound()
+        public async Task GetUserByEmail_NonExistingUser_ReturnsNotFound()
         {
-            var email = "definitely-not-existing-" + Guid.NewGuid()
+            var email = "defcditelynot-existing-" + Guid.NewGuid()
                 + "@example.com";
 
-            var result = _controller
-                .GetUserByEmail(email)
-                .Result;
+            var result = await _controller
+                .GetUserByEmail(email);
 
             Assert.IsType<NotFoundResult>(result.Result);
         }

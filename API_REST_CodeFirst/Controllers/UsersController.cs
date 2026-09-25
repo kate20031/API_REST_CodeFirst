@@ -1,6 +1,7 @@
-﻿using API_REST_CodeFirst.Models.EntityFramework;
+﻿using API_REST_CodeFirst.Models.DataManager;
+using API_REST_CodeFirst.Models.EntityFramework;
+using API_REST_CodeFirst.Models.Repository;
 using Microsoft.AspNetCore.Mvc;
-using API_REST_CodeFirst.Repositories;
 
 namespace API_REST_CodeFirst.Controllers
 {
@@ -8,27 +9,25 @@ namespace API_REST_CodeFirst.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly IUserRepository _repository;
+        private readonly IDataRepository<User> _dataRepository;
 
-        public UsersController(IUserRepository repository)
+        public UsersController(IDataRepository<User> dataRepository)
         {
-            _repository = repository;
+            _dataRepository = dataRepository;
         }
-
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-            var users = await _repository.GetAll();
+            var users = await _dataRepository.GetAll();
 
             return Ok(users);
         }
 
-
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUtilisateurById(int id)
         {
-            var user = await _repository.GetById(id);
+            var user = await _dataRepository.GetById(id);
 
             if (user == null)
             {
@@ -37,12 +36,11 @@ namespace API_REST_CodeFirst.Controllers
 
             return user;
         }
-
 
         [HttpGet("email/{email}")]
         public async Task<ActionResult<User>> GetUserByEmail(string email)
         {
-            var user = await _repository.GetByEmail(email);
+            var user = await _dataRepository.GetByStringAsync(email);
 
             if (user == null)
             {
@@ -51,7 +49,6 @@ namespace API_REST_CodeFirst.Controllers
 
             return user;
         }
-
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -63,7 +60,7 @@ namespace API_REST_CodeFirst.Controllers
                 return BadRequest(ModelState);
             }
 
-            user = await _repository.Add(user);
+            await _dataRepository.AddAsync(user);
 
             return CreatedAtAction(
                 nameof(GetUtilisateurById),
@@ -82,53 +79,38 @@ namespace API_REST_CodeFirst.Controllers
                 return BadRequest(ModelState);
             }
 
-            
             if (id != user.UserId)
             {
                 return BadRequest();
             }
 
-            var existingUser = await _repository.GetById(id);
+            var existingUser = await _dataRepository.GetById(id);
 
             if (existingUser == null)
             {
                 return NotFound();
             }
 
-            existingUser.Name = user.Name;
-            existingUser.FirstName = user.FirstName;
-            existingUser.Mobile = user.Mobile;
-            existingUser.Mail = user.Mail;
-            existingUser.Pwd = user.Pwd;
-            existingUser.Street = user.Street;
-            existingUser.Postcode = user.Postcode;
-            existingUser.City = user.City;
-            existingUser.Country = user.Country;
-            existingUser.Latitude = user.Latitude;
-            existingUser.Longitude = user.Longitude;
-
-            await _repository.Update(existingUser);
+            await _dataRepository.UpdateAsync(existingUser, user);
 
             return NoContent();
         }
-
 
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var user = await _repository.GetById(id);
+            var user = await _dataRepository.GetById(id);
 
             if (user == null)
             {
                 return NotFound();
             }
 
-            await _repository.Delete(id);
+            await _dataRepository.DeleteAsync(user);
 
             return NoContent();
         }
-
     }
 }

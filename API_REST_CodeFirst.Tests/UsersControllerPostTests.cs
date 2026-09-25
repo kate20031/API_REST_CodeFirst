@@ -6,7 +6,7 @@ namespace API_REST_CodeFirst.Tests
     public class UsersControllerPostTests : TestBase
     {
         [Fact]
-        public void PostUser_ValidUser_CreatesUser()
+        public async Task PostUser_ValidUser_CreatesUser()
         {
             var uniqueEmail = $"test-{Guid.NewGuid()}@example.com";
 
@@ -23,7 +23,7 @@ namespace API_REST_CodeFirst.Tests
                 Country = "France"
             };
 
-            var result = _controller.PostUser(userToTest).Result;
+            var result = await _controller.PostUser(userToTest);
 
             var createdResult = Assert.IsType<CreatedAtActionResult>(result.Result);
             var createdUser = Assert.IsType<User>(createdResult.Value);
@@ -39,7 +39,7 @@ namespace API_REST_CodeFirst.Tests
         }
 
         [Fact]
-        public void PostUser_InvalidModel_ReturnsBadRequest()
+        public async Task PostUser_InvalidModel_ReturnsBadRequest()
         {
             var userToTest = new User
             {
@@ -51,7 +51,7 @@ namespace API_REST_CodeFirst.Tests
 
             _controller.ModelState.AddModelError("Mail", "Invalid email address");
 
-            var result = _controller.PostUser(userToTest).Result;
+            var result = await _controller.PostUser(userToTest);
 
             Assert.IsType<BadRequestObjectResult>(result.Result);
         }

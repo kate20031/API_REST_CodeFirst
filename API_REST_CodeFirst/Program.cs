@@ -1,5 +1,6 @@
+using API_REST_CodeFirst.Models.DataManager;
 using API_REST_CodeFirst.Models.EntityFramework;
-using API_REST_CodeFirst.Repositories;
+using API_REST_CodeFirst.Models.Repository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,7 +11,7 @@ builder.Services.AddDbContext<CinemaContext>(options =>
     ));
 
 
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IDataRepository<User>, UserManager>();
 
 // Add services to the container.
 
