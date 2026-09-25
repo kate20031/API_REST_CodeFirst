@@ -9,11 +9,11 @@ namespace API_REST_CodeFirst.Tests
         public void GetUsers_ReturnsAllUsers()
         {
             var expectedUsers = _context.Users.ToList();
-
             var result = _controller.GetUsers().Result;
-            var actualUsers = result.Value;
 
-            Assert.NotNull(actualUsers);
+            var okResult = Assert.IsType<OkObjectResult>(result.Result);
+            var actualUsers = Assert.IsAssignableFrom<IEnumerable<User>>(okResult.Value);
+
             Assert.Equal(expectedUsers.Count, actualUsers.Count());
 
             foreach (var expectedUser in expectedUsers)

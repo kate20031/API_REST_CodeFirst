@@ -19,10 +19,12 @@ namespace API_REST_CodeFirst.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-            return Ok(await _repository.GetAll());
+            var users = await _repository.GetAll();
+
+            return Ok(users);
         }
 
-  
+
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUtilisateurById(int id)
         {
