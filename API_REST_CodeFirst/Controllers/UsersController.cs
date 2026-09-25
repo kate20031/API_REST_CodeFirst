@@ -1,6 +1,6 @@
 ﻿using API_REST_CodeFirst.Models.EntityFramework;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using API_REST_CodeFirst.Repositories;
 
 namespace API_REST_CodeFirst.Controllers
 {
@@ -8,25 +8,25 @@ namespace API_REST_CodeFirst.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly CinemaContext _context;
+        private readonly IUserRepository _repository;
 
-        public UsersController(CinemaContext context)
+        public UsersController(IUserRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-            return await _context.Users.ToListAsync();
+            return Ok(await _repository.GetAll());
         }
 
   
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUtilisateurById(int id)
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await _repository.GetById(id);
 
             if (user == null)
             {
@@ -40,9 +40,7 @@ namespace API_REST_CodeFirst.Controllers
         [HttpGet("email/{email}")]
         public async Task<ActionResult<User>> GetUserByEmail(string email)
         {
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u =>
-                    u.Mail.ToUpper() == email.ToUpper());
+            var user = await _repository.GetByEmail(email);
 
             if (user == null)
             {
@@ -63,8 +61,7 @@ namespace API_REST_CodeFirst.Controllers
                 return BadRequest(ModelState);
             }
 
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            user = await _repository.Add(user);
 
             return CreatedAtAction(
                 nameof(GetUtilisateurById),
@@ -89,11 +86,10 @@ namespace API_REST_CodeFirst.Controllers
                 return BadRequest();
             }
 
-            var existingUser = await _context.Users.FindAsync(id);
+            var existingUser = await _repository.GetById(id);
 
             if (existingUser == null)
             {
-                
                 return NotFound();
             }
 
@@ -109,7 +105,7 @@ namespace API_REST_CodeFirst.Controllers
             existingUser.Latitude = user.Latitude;
             existingUser.Longitude = user.Longitude;
 
-            await _context.SaveChangesAsync();
+            await _repository.Update(existingUser);
 
             return NoContent();
         }
@@ -120,18 +116,14 @@ namespace API_REST_CodeFirst.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await _repository.GetById(id);
 
             if (user == null)
             {
                 return NotFound();
             }
 
-            
-            _context.Users.Remove(user);
-            
-            
-            await _context.SaveChangesAsync();
+            await _repository.Delete(id);
 
             return NoContent();
         }

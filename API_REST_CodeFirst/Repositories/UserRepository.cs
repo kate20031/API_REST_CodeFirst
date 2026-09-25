@@ -25,6 +25,15 @@ namespace API_REST_CodeFirst.Repositories
             return await _context.Users.FindAsync(id);
         }
 
+
+        public async Task<User?> GetByEmail(string email)
+        {
+            return await _context.Users
+                .FirstOrDefaultAsync(u =>
+                    u.Mail.ToUpper() == email.ToUpper());
+        }
+
+
         public async Task<User> Add(User user)
         {
             _context.Users.Add(user);
