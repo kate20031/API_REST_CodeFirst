@@ -3,6 +3,7 @@ using API_REST_CodeFirst.Models.EntityFramework;
 using API_REST_CodeFirst.Models.Repository;
 using Microsoft.EntityFrameworkCore;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<CinemaContext>(options =>
@@ -13,16 +14,13 @@ builder.Services.AddDbContext<CinemaContext>(options =>
 
 builder.Services.AddScoped<IDataRepository<User>, UserManager>();
 
-// Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

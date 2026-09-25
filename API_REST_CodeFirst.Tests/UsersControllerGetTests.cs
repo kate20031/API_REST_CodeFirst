@@ -12,8 +12,7 @@ namespace API_REST_CodeFirst.Tests
 
             var result = await _controller.GetUsers();
 
-            var okResult = Assert.IsType<OkObjectResult>(result.Result);
-            var actualUsers = Assert.IsAssignableFrom<IEnumerable<User>>(okResult.Value);
+            var actualUsers = Assert.IsAssignableFrom<IEnumerable<User>>(result.Value);
 
             Assert.Equal(expectedUsers.Count, actualUsers.Count());
 
