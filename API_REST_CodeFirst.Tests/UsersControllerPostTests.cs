@@ -1,5 +1,8 @@
-﻿using API_REST_CodeFirst.Models.EntityFramework;
+﻿using API_REST_CodeFirst.Controllers;
+using API_REST_CodeFirst.Models.EntityFramework;
+using API_REST_CodeFirst.Models.Repository;
 using Microsoft.AspNetCore.Mvc;
+using Moq;
 
 namespace API_REST_CodeFirst.Tests
 {
@@ -54,6 +57,42 @@ namespace API_REST_CodeFirst.Tests
             var result = await _controller.PostUser(userToTest);
 
             Assert.IsType<BadRequestObjectResult>(result.Result);
+        }
+
+        [Fact]
+        public async Task PostUser_ValidUser_CreatesUser_AvecMoq()
+        {
+            var mockRepository = new Mock<IDataRepository<User>>();
+
+            var userController = new UsersController(mockRepository.Object);
+
+            var user = new User
+            {
+                Name = "KATYA",                 
+                FirstName = "Test",             
+                Mobile = "0612345678",       
+                Mail = "katya@test.com",       
+                Pwd = "Test1234!",         
+                Street = "1 Test Street",      
+                Postcode = "74000",            
+                City = "Annecy",                
+                Country = "France"             
+            };
+
+            var actionResult = await userController.PostUser(user);
+
+            var createdResult = Assert.IsType<CreatedAtActionResult>(
+                actionResult.Result
+            );
+
+            var createdUser = Assert.IsType<User>(
+                createdResult.Value
+            );
+
+            user.UserId = createdUser.UserId;
+
+
+            Assert.Equal(user, createdUser);
         }
     }
 }
