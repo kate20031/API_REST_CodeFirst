@@ -66,6 +66,10 @@ namespace API_REST_CodeFirst.Tests
                 new UsersController(mockRepository.Object);
             var result = await userController.DeleteUser(user.UserId);
             Assert.IsType<NoContentResult>(result);
+
+            mockRepository.Verify(
+            x => x.DeleteAsync(user),
+            Times.Once);
         }
     }
 }
