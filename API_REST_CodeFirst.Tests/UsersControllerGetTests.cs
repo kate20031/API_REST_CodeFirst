@@ -1,5 +1,8 @@
+using API_REST_CodeFirst.Controllers;
 using API_REST_CodeFirst.Models.EntityFramework;
+using API_REST_CodeFirst.Models.Repository;
 using Microsoft.AspNetCore.Mvc;
+using Moq;
 
 namespace API_REST_CodeFirst.Tests
 {
@@ -79,6 +82,59 @@ namespace API_REST_CodeFirst.Tests
 
             var result = await _controller
                 .GetUserByEmail(email);
+
+            Assert.IsType<NotFoundResult>(result.Result);
+        }
+
+        [Fact]
+        public async Task GetUtilisateurById_ExistingUser_ReturnsUser_AvecMoq()
+        {
+
+            var user = new User
+            {
+                UserId = 1,
+                Name = "Dubois",
+                FirstName = "Camille",
+                Mobile = "0612345678",
+                Mail = "camille.dubois@gmail.com",
+                Pwd = "Test1234!",
+
+                Street = "Impasse des bergeronneses",
+                Postcode = "74200",
+                City = "Allinges",
+                Country = "France"
+            };
+
+            var mockRepository = new Mock<IDataRepository<User>>();
+
+            mockRepository
+                .Setup(x => x.GetById(1))
+                .Returns(new ActionResult<User>(user));
+
+            var userController =
+                new UsersController(mockRepository.Object);
+
+            var result = await userController.GetUtilisateurById(1);
+
+            Assert.NotNull(result.Value);
+            Assert.Equal(user, result.Value);
+        }
+
+        [Fact]
+        public async Task GetUtilisateurById_UnknownId_ReturnsNotFound_AvecMoq()
+        {
+            var mockRepository = new Mock<IDataRepository<User>>();
+
+            mockRepository
+                .Setup(x => x.GetById(It.IsAny<int>()))
+                .Returns(new Microsoft.AspNetCore.Mvc.ActionResult<User>(
+                    new NotFoundResult()
+                ));
+
+            var userController =
+                new UsersController(mockRepository.Object);
+
+            var result = await userController.GetUtilisateurById(0);
 
             Assert.IsType<NotFoundResult>(result.Result);
         }
