@@ -8,6 +8,24 @@ namespace API_REST_CodeFirst.Tests
 {
     public class UsersControllerGetTests : TestBase
     {
+        private User CreateTestUser()
+        {
+            return new User
+            {
+                UserId = 1,
+                Name = "Dubois",
+                FirstName = "Camille",
+              
+                Mobile  = "0612345678",
+                Mail = "camille.dubois@gmail.com",
+                Pwd   =  "Test1234!",
+                Street = "Impasse des bergeronneses",
+                Postcode = "74200",
+                City  = "Allinges",
+                Country = "France"
+            };
+        }
+
         [Fact]
         public async Task GetUsers_ReturnsAllUsers()
         {
@@ -77,11 +95,9 @@ namespace API_REST_CodeFirst.Tests
         [Fact]
         public async Task GetUserByEmail_NonExistingUser_ReturnsNotFound()
         {
-            var email = "defcditelynot-existing-" + Guid.NewGuid()
-                + "@example.com";
+            var email = "definitely-not-existing-" + Guid.NewGuid() + "@example.com";
 
-            var result = await _controller
-                .GetUserByEmail(email);
+            var result = await _controller.GetUserByEmail(email);
 
             Assert.IsType<NotFoundResult>(result.Result);
         }
@@ -89,32 +105,18 @@ namespace API_REST_CodeFirst.Tests
         [Fact]
         public async Task GetUtilisateurById_ExistingUser_ReturnsUser_AvecMoq()
         {
-
-            var user = new User
-            {
-                UserId = 1,
-                Name = "Dubois",
-                FirstName = "Camille",
-                Mobile = "0612345678",
-                Mail = "camille.dubois@gmail.com",
-                Pwd = "Test1234!",
-
-                Street = "Impasse des bergeronneses",
-                Postcode = "74200",
-                City = "Allinges",
-                Country = "France"
-            };
+            var user = CreateTestUser();
 
             var mockRepository = new Mock<IDataRepository<User>>();
 
             mockRepository
-                .Setup(x => x.GetById(1))
+                .Setup(x => x.GetById(user.UserId))
                 .Returns(new ActionResult<User>(user));
 
-            var userController =
-                new UsersController(mockRepository.Object);
+            var userController = new UsersController(mockRepository.Object);
 
-            var result = await userController.GetUtilisateurById(1);
+            var result =
+                await userController.GetUtilisateurById(user.UserId);
 
             Assert.NotNull(result.Value);
             Assert.Equal(user, result.Value);
@@ -127,14 +129,61 @@ namespace API_REST_CodeFirst.Tests
 
             mockRepository
                 .Setup(x => x.GetById(It.IsAny<int>()))
-                .Returns(new Microsoft.AspNetCore.Mvc.ActionResult<User>(
-                    new NotFoundResult()
-                ));
+                .Returns(
+                    new ActionResult<User>(
+                        new NotFoundResult()
+                    )
+                );
 
             var userController =
                 new UsersController(mockRepository.Object);
 
-            var result = await userController.GetUtilisateurById(0);
+            var result =
+                await userController.GetUtilisateurById(0);
+
+            Assert.IsType<NotFoundResult>(result.Result);
+        }
+
+        [Fact]
+        public async Task GetUserByEmail_ExistingEmail_ReturnsUser_AvecMoq()
+        {
+            var user = CreateTestUser();
+
+            var mockRepository = new Mock<IDataRepository<User>>();
+
+            mockRepository.Setup(x => x.GetByStringAsync(user.Mail))
+                .ReturnsAsync(
+                    new ActionResult<User>(user)
+                );
+
+            var userController = new UsersController(mockRepository.Object);
+
+            var result =   await userController.GetUserByEmail(user.Mail);
+
+            Assert.NotNull(result.Value);
+
+
+            Assert.Equal(user, result.Value);
+        }
+
+        [Fact]
+        public async Task GetUserByEmail_UnknownEmail_ReturnsNotFound_AvecMoq()
+        {
+            var mockRepository = new Mock<IDataRepository<User>>();
+
+            mockRepository
+                .Setup(x => x.GetByStringAsync(It.IsAny<string>()))
+                .ReturnsAsync(
+                    new ActionResult<User>(
+                        new NotFoundResult()
+                    )
+                );
+
+            var userController =  new UsersController(mockRepository.Object);
+
+            var result =  await userController.GetUserByEmail(
+                    "unknown.student@student.fr"
+                );
 
             Assert.IsType<NotFoundResult>(result.Result);
         }
