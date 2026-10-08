@@ -6,8 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API_REST_CodeFirst.Models.DataManager
 {
-    public class MovieManager
-    {
+	public class MovieManager : IMovieManager
+	{
         private readonly CinemaContext _context;
         private readonly IMapper _mapper;
 

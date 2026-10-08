@@ -8,9 +8,9 @@ namespace API_REST_CodeFirst.Controllers
     [ApiController]
     public class MoviesController : ControllerBase
     {
-        private readonly MovieManager _movieManager;
+        private readonly IMovieManager _movieManager;
 
-        public MoviesController(MovieManager movieManager)
+        public MoviesController(IMovieManager movieManager)
         {
             _movieManager = movieManager;
         }
