@@ -20,5 +20,18 @@ namespace API_REST_CodeFirst.Controllers
         {
             return Ok(_movieManager.GetAll());
         }
+
+        [HttpGet("{id}")]
+        public ActionResult<MovieDetailDto> GetMovie(int id)
+        {
+            var movie = _movieManager.GetById(id);
+
+            if (movie == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(movie);
+        }
     }
 }
