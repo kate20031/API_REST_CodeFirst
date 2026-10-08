@@ -10,6 +10,7 @@ builder.Services.AddAutoMapper(
     AppDomain.CurrentDomain.GetAssemblies()
 );
 
+
 builder.Services.AddDbContext<CinemaContext>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("CinemaConnection")
@@ -18,6 +19,7 @@ builder.Services.AddDbContext<CinemaContext>(options =>
 
 builder.Services.AddScoped<IDataRepository<User>, UserManager>();
 
+builder.Services.AddScoped<MovieManager>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
