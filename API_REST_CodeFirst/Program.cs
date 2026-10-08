@@ -6,6 +6,10 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddAutoMapper(
+    AppDomain.CurrentDomain.GetAssemblies()
+);
+
 builder.Services.AddDbContext<CinemaContext>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("CinemaConnection")
