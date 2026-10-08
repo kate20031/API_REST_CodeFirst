@@ -19,7 +19,7 @@ builder.Services.AddDbContext<CinemaContext>(options =>
 
 builder.Services.AddScoped<IDataRepository<User>, UserManager>();
 
-builder.Services.AddScoped<MovieManager>();
+builder.Services.AddScoped<IMovieManager, MovieManager>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
