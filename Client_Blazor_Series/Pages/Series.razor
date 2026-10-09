@@ -15,19 +15,11 @@
 
     <button class="btn btn-secondary"
             @onclick="ReloadSlow"
-            disabled="@ViewModel.ReloadSlowCommand.IsRunning">
+            disabled="@isSlowLoading">
         Rechargement lent
     </button>
 
-    @if (ViewModel.LoadSeriesCommand.CanBeCanceled)
-    {
-        <button class="btn btn-danger"
-                @onclick="CancelLoad">
-            Annuler
-        </button>
-    }
-
-    @if (ViewModel.ReloadSlowCommand.CanBeCanceled)
+    @if (isSlowLoading)
     {
         <button class="btn btn-danger"
                 @onclick="CancelSlowLoad">
@@ -36,8 +28,7 @@
     }
 </div>
 
-@if (ViewModel.LoadSeriesCommand.IsRunning ||
-     ViewModel.ReloadSlowCommand.IsRunning)
+@if (isSlowLoading || ViewModel.LoadSeriesCommand.IsRunning)
 {
     <p role="status">
         <span class="spinner-border spinner-border-sm"
@@ -82,15 +73,17 @@
         </tbody>
     </table>
 }
-
-else if (!ViewModel.LoadSeriesCommand.IsRunning &&
-         !ViewModel.ReloadSlowCommand.IsRunning &&
+else if (!isSlowLoading &&
+         !ViewModel.LoadSeriesCommand.IsRunning &&
          string.IsNullOrEmpty(ViewModel.ErrorMessage))
 {
     <p>Aucune série à afficher.</p>
 }
 
 @code {
+    private bool isSlowLoading;
+    private CancellationTokenSource? slowLoadCts;
+
     protected override async Task OnInitializedAsync()
     {
         await LoadSeries();
@@ -103,16 +96,31 @@ else if (!ViewModel.LoadSeriesCommand.IsRunning &&
 
     private async Task ReloadSlow()
     {
-        await ViewModel.ReloadSlowCommand.ExecuteAsync(null);
-    }
+        if (isSlowLoading)
+            return;
 
-    private void CancelLoad()
-    {
-        ViewModel.LoadSeriesCommand.Cancel();
+        isSlowLoading = true;
+        slowLoadCts = new CancellationTokenSource();
+
+        try
+        {
+            await Task.Delay(5000, slowLoadCts.Token);
+            await ViewModel.LoadSeriesCommand.ExecuteAsync(null);
+        }
+        catch (OperationCanceledException)
+        {
+            ViewModel.StatusMessage = "Chargement annulé.";
+        }
+        finally
+        {
+            isSlowLoading = false;
+            slowLoadCts.Dispose();
+            slowLoadCts = null;
+        }
     }
 
     private void CancelSlowLoad()
     {
-        ViewModel.ReloadSlowCommand.Cancel();
+        slowLoadCts?.Cancel();
     }
 }
