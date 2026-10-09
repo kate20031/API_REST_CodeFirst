@@ -27,7 +27,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Allow the Blazor WebAssembly client to call the API.
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("BlazorClient", policy =>
