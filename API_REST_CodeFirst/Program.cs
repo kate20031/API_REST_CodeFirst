@@ -16,8 +16,14 @@ builder.Services.AddDbContext<CinemaContext>(options =>
         builder.Configuration.GetConnectionString("CinemaConnection")
     ));
 
+builder.Services.AddDbContext<SeriesContext>(options =>
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("SeriesConnection")
+    ));
+
 
 builder.Services.AddScoped<IDataRepository<User>, UserManager>();
+builder.Services.AddScoped<ISerieManager, SerieManager>();
 
 builder.Services.AddScoped<IMovieManager, MovieManager>();
 
