@@ -1,0 +1,118 @@
+﻿@page "/series"
+@using Client_Blazor_Series.ViewModels
+@inject SeriesViewModel ViewModel
+
+<PageTitle>Liste des séries</PageTitle>
+
+<h1>Liste des séries</h1>
+
+<div class="mb-3">
+    <button class="btn btn-primary"
+            @onclick="LoadSeries"
+            disabled="@ViewModel.LoadSeriesCommand.IsRunning">
+        Recharger
+    </button>
+
+    <button class="btn btn-secondary"
+            @onclick="ReloadSlow"
+            disabled="@ViewModel.ReloadSlowCommand.IsRunning">
+        Rechargement lent
+    </button>
+
+    @if (ViewModel.LoadSeriesCommand.CanBeCanceled)
+    {
+        <button class="btn btn-danger"
+                @onclick="CancelLoad">
+            Annuler
+        </button>
+    }
+
+    @if (ViewModel.ReloadSlowCommand.CanBeCanceled)
+    {
+        <button class="btn btn-danger"
+                @onclick="CancelSlowLoad">
+            Annuler le chargement lent
+        </button>
+    }
+</div>
+
+@if (ViewModel.LoadSeriesCommand.IsRunning ||
+     ViewModel.ReloadSlowCommand.IsRunning)
+{
+    <p role="status">
+        <span class="spinner-border spinner-border-sm"
+              aria-hidden="true"></span>
+        Chargement en cours...
+    </p>
+}
+
+@if (!string.IsNullOrWhiteSpace(ViewModel.StatusMessage))
+{
+    <p role="status">@ViewModel.StatusMessage</p>
+}
+
+@if (!string.IsNullOrWhiteSpace(ViewModel.ErrorMessage))
+{
+    <p class="text-danger" role="alert">
+        @ViewModel.ErrorMessage
+    </p>
+}
+
+@if (ViewModel.Series.Count > 0)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Titre</th>
+                <th>Année de création</th>
+                <th>Réseau</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var serie in ViewModel.Series)
+            {
+                <tr @key="serie.SerieId">
+                    <td>@serie.SerieId</td>
+                    <td>@serie.Titre</td>
+                    <td>@(serie.AnneeCreation?.ToString() ?? "Inconnue")</td>
+                    <td>@(serie.Network ?? "Inconnu")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+else if (!ViewModel.LoadSeriesCommand.IsRunning &&
+         !ViewModel.ReloadSlowCommand.IsRunning &&
+         string.IsNullOrEmpty(ViewModel.ErrorMessage))
+{
+    <p>Aucune série à afficher.</p>
+}
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSeries();
+    }
+
+    private async Task LoadSeries()
+    {
+        await ViewModel.LoadSeriesCommand.ExecuteAsync(null);
+    }
+
+    private async Task ReloadSlow()
+    {
+        await ViewModel.ReloadSlowCommand.ExecuteAsync(null);
+    }
+
+    private void CancelLoad()
+    {
+        ViewModel.LoadSeriesCommand.Cancel();
+    }
+
+    private void CancelSlowLoad()
+    {
+        ViewModel.ReloadSlowCommand.Cancel();
+    }
+}
