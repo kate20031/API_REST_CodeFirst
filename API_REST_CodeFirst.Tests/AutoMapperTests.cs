@@ -15,5 +15,16 @@ namespace API_REST_CodeFirst.Tests
 
             configuration.AssertConfigurationIsValid();
         }
+
+        [Fact]
+        public void SeriesAutoMapper_Configuration_IsValid()
+        {
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile<API_REST_CodeFirst.Profiles.SeriesProfile>();
+            });
+
+            config.AssertConfigurationIsValid();
+        }
     }
 }
