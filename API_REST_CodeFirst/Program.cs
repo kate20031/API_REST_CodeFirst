@@ -1,3 +1,4 @@
+
 using API_REST_CodeFirst.Models.DataManager;
 using API_REST_CodeFirst.Models.EntityFramework;
 using API_REST_CodeFirst.Models.Repository;
@@ -5,19 +6,13 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddAutoMapper(
-    AppDomain.CurrentDomain.GetAssemblies()
-);
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddDbContext<CinemaContext>(options =>
-    options.UseNpgsql(
-        builder.Configuration.GetConnectionString("CinemaConnection")
-    ));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("CinemaConnection")));
 
 builder.Services.AddDbContext<SeriesContext>(options =>
-    options.UseNpgsql(
-        builder.Configuration.GetConnectionString("SeriesConnection")
-    ));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("SeriesConnection")));
 
 builder.Services.AddScoped<IDataRepository<User>, UserManager>();
 builder.Services.AddScoped<ISerieManager, SerieManager>();
@@ -27,14 +22,15 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("BlazorClient", policy =>
     {
-        policy.WithOrigins("https://localhost:7275")
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        policy.WithOrigins(
+                "http://localhost:5015",
+                "https://localhost:7275")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
     });
 });
 
@@ -47,18 +43,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseCors("BlazorClient");
-
 app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
-
-
-app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

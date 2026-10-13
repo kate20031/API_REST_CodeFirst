@@ -3,7 +3,7 @@ using Client_Blazor_Series.Services;
 using Client_Blazor_Series.Models.DTO;
 using System.Net.Http.Json;
 
-namespace ClientBlazorSeries.Services;
+namespace Client_Blazor_Series.Services;
 
 public class SerieService : ISerieService
 {
