@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="API_REST_CodeFirst.Tests/API_REST_CodeFirst.Tests.csproj" Id="8c2a6424-8caa-4a89-bb05-b5ccd7ef3f40" />
   <Project Path="API_REST_CodeFirst/API_REST_CodeFirst.csproj" />
+  <Project Path="Client_Blazor_Series.Tests/Client_Blazor_Series.Tests.csproj" Id="7177c62c-8c29-4bc1-81d6-2dc34cdc6b46" />
   <Project Path="Client_Blazor_Series/Client_Blazor_Series.csproj" Id="509e3a32-34b1-43b7-b2d1-0456e77c8773" />
 </Solution>

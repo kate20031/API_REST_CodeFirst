@@ -1,0 +1,103 @@
+﻿@page "/series/{Id:int}"
+@using System.ComponentModel.DataAnnotations
+@using Client_Blazor_Series.Models.DTO
+@using Client_Blazor_Series.ViewModels
+@inject SerieDetailViewModel ViewModel
+
+<PageTitle>Détails de la série</PageTitle>
+
+<h1>Détails de la série</h1>
+
+@if (!string.IsNullOrWhiteSpace(ViewModel.ErrorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        @ViewModel.ErrorMessage
+    </div>
+}
+
+@if (!string.IsNullOrWhiteSpace(ViewModel.StatusMessage))
+{
+    <div class="alert alert-info" role="status">
+        @ViewModel.StatusMessage
+    </div>
+}
+
+@if (ViewModel.LoadCommand.IsRunning)
+{
+    <p role="status">Chargement de la série...</p>
+}
+else if (ViewModel.Serie is not null)
+{
+    <EditForm Model="@ViewModel.Serie" OnValidSubmit="SaveAsync">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label class="form-label" for="titre">Titre</label>
+            <InputText id="titre"
+                       class="form-control"
+                       @bind-Value="ViewModel.Serie.Titre" />
+            <ValidationMessage For="@(() => ViewModel.Serie.Titre)" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="resume">Résumé</label>
+            <InputTextArea id="resume"
+                           class="form-control"
+                           @bind-Value="ViewModel.Serie.Resume" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="saisons">Nombre de saisons</label>
+            <InputNumber id="saisons"
+                         class="form-control"
+                         @bind-Value="ViewModel.Serie.NbSaisons" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="episodes">Nombre d'épisodes</label>
+            <InputNumber id="episodes"
+                         class="form-control"
+                         @bind-Value="ViewModel.Serie.NbEpisodes" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="annee">Année de création</label>
+            <InputNumber id="annee"
+                         class="form-control"
+                         @bind-Value="ViewModel.Serie.AnneeCreation" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label" for="network">Réseau</label>
+            <InputText id="network"
+                       class="form-control"
+                       @bind-Value="ViewModel.Serie.Network" />
+        </div>
+
+        <button type="submit"
+                class="btn btn-primary"
+                disabled="@ViewModel.SaveCommand.IsRunning">
+            Enregistrer
+        </button>
+
+        <a href="/series" class="btn btn-secondary ms-2">
+            Retour à la liste
+        </a>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await ViewModel.LoadCommand.ExecuteAsync(Id);
+    }
+
+    private async Task SaveAsync()
+    {
+        await ViewModel.SaveCommand.ExecuteAsync(null);
+    }
+}

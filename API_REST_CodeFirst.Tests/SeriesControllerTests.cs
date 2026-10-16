@@ -1,4 +1,5 @@
-﻿using API_REST_CodeFirst.Controllers;
+﻿
+using API_REST_CodeFirst.Controllers;
 using API_REST_CodeFirst.Models.DataManager;
 using API_REST_CodeFirst.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
@@ -34,7 +35,6 @@ namespace API_REST_CodeFirst.Tests
             var result = controller.GetSeries();
 
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
-
             var returnedSeries =
                 Assert.IsAssignableFrom<IEnumerable<SerieDto>>(okResult.Value);
 
@@ -69,7 +69,6 @@ namespace API_REST_CodeFirst.Tests
             var result = controller.GetSerie(1);
 
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
-
             var returnedSerie =
                 Assert.IsType<SerieDetailDto>(okResult.Value);
 
@@ -124,7 +123,6 @@ namespace API_REST_CodeFirst.Tests
             var result = controller.GetNetworks();
 
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
-
             var returnedNetworks =
                 Assert.IsAssignableFrom<IEnumerable<NetworkDto>>(okResult.Value);
 
@@ -135,6 +133,80 @@ namespace API_REST_CodeFirst.Tests
 
             Assert.Equal(2, netflix.NbSeries);
             Assert.Equal(30, netflix.TotalEpisodes);
+        }
+
+        [Fact]
+        public void UpdateSerie_ValidSerie_ReturnsNoContent()
+        {
+            var mockManager = new Mock<ISerieManager>();
+
+            var serie = new SerieDetailDto
+            {
+                SerieId = 1,
+                Titre = "Scrubs Updated",
+                Resume = "Updated description",
+                NbSaisons = 9,
+                NbEpisodes = 184,
+                AnneeCreation = 2001,
+                Network = "ABC (US)"
+            };
+
+            mockManager
+                .Setup(m => m.UpdateSerie(1, serie))
+                .Returns(true);
+
+            var controller = new SeriesController(mockManager.Object);
+
+            var result = controller.UpdateSerie(1, serie);
+
+            Assert.IsType<NoContentResult>(result);
+            mockManager.Verify(m => m.UpdateSerie(1, serie), Times.Once);
+        }
+
+        [Fact]
+        public void UpdateSerie_UnknownId_ReturnsNotFound()
+        {
+            var mockManager = new Mock<ISerieManager>();
+
+            var serie = new SerieDetailDto
+            {
+                SerieId = 999,
+                Titre = "Unknown series"
+            };
+
+            mockManager
+                .Setup(m => m.UpdateSerie(999, serie))
+                .Returns(false);
+
+            var controller = new SeriesController(mockManager.Object);
+
+            var result = controller.UpdateSerie(999, serie);
+
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public void UpdateSerie_MismatchedIds_ReturnsBadRequest()
+        {
+            var mockManager = new Mock<ISerieManager>();
+
+            var serie = new SerieDetailDto
+            {
+                SerieId = 2,
+                Titre = "Scrubs"
+            };
+
+            var controller = new SeriesController(mockManager.Object);
+
+            var result = controller.UpdateSerie(1, serie);
+
+            Assert.IsType<BadRequestObjectResult>(result);
+
+            mockManager.Verify(
+                m => m.UpdateSerie(
+                    It.IsAny<int>(),
+                    It.IsAny<SerieDetailDto>()),
+                Times.Never);
         }
     }
 }

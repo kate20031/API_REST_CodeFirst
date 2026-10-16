@@ -1,5 +1,8 @@
-﻿@page "/series"
+﻿\
+@page "/series"
 @using Client_Blazor_Series.ViewModels
+@using System.ComponentModel
+@implements IDisposable
 @inject SeriesViewModel ViewModel
 
 <PageTitle>Liste des séries</PageTitle>
@@ -51,13 +54,14 @@
 
 @if (ViewModel.Series.Count > 0)
 {
-    <table class="table">
+    <table class="table table-striped table-hover">
         <thead>
             <tr>
                 <th>ID</th>
                 <th>Titre</th>
                 <th>Année de création</th>
                 <th>Réseau</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -68,6 +72,12 @@
                     <td>@serie.Titre</td>
                     <td>@(serie.AnneeCreation?.ToString() ?? "Inconnue")</td>
                     <td>@(serie.Network ?? "Inconnu")</td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-primary"
+                           href="@($"/series/{serie.SerieId}")">
+                            Détails / Modifier
+                        </a>
+                    </td>
                 </tr>
             }
         </tbody>
@@ -80,9 +90,29 @@ else if (!ViewModel.LoadCommand.IsRunning
 }
 
 @code {
+    protected override void OnInitialized()
+    {
+        ViewModel.PropertyChanged += OnViewModelPropertyChanged;
+        ViewModel.LoadCommand.PropertyChanged += OnCommandPropertyChanged;
+    }
+
     protected override async Task OnInitializedAsync()
     {
         await LoadFast();
+    }
+
+    private void OnViewModelPropertyChanged(
+        object? sender,
+        PropertyChangedEventArgs e)
+    {
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void OnCommandPropertyChanged(
+        object? sender,
+        PropertyChangedEventArgs e)
+    {
+        _ = InvokeAsync(StateHasChanged);
     }
 
     private async Task LoadFast()
@@ -100,5 +130,11 @@ else if (!ViewModel.LoadCommand.IsRunning
     private void CancelLoad()
     {
         ViewModel.LoadCommand.Cancel();
+    }
+
+    public void Dispose()
+    {
+        ViewModel.PropertyChanged -= OnViewModelPropertyChanged;
+        ViewModel.LoadCommand.PropertyChanged -= OnCommandPropertyChanged;
     }
 }

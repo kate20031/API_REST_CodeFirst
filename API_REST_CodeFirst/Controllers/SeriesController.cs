@@ -1,4 +1,5 @@
-﻿using API_REST_CodeFirst.Models.DataManager;
+﻿
+using API_REST_CodeFirst.Models.DataManager;
 using API_REST_CodeFirst.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
 
@@ -36,6 +37,20 @@ namespace API_REST_CodeFirst.Controllers
         public ActionResult<IEnumerable<NetworkDto>> GetNetworks()
         {
             return Ok(_serieManager.GetNetworks());
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateSerie(int id, [FromBody] SerieDetailDto serie)
+        {
+            if (id != serie.SerieId)
+                return BadRequest("L'identifiant ne correspond pas.");
+
+            var updated = _serieManager.UpdateSerie(id, serie);
+
+            if (!updated)
+                return NotFound();
+
+            return NoContent();
         }
     }
 }

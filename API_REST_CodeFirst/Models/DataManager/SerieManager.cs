@@ -1,6 +1,8 @@
-﻿using AutoMapper;
+﻿
+using AutoMapper;
 using API_REST_CodeFirst.Models.DTO;
 using API_REST_CodeFirst.Models.EntityFramework;
+using Microsoft.EntityFrameworkCore;
 
 namespace API_REST_CodeFirst.Models.DataManager
 {
@@ -18,7 +20,6 @@ namespace API_REST_CodeFirst.Models.DataManager
         public IEnumerable<SerieDto> GetSeries()
         {
             var series = _context.Series.ToList();
-
             return _mapper.Map<IEnumerable<SerieDto>>(series);
         }
 
@@ -43,6 +44,26 @@ namespace API_REST_CodeFirst.Models.DataManager
                     TotalEpisodes = g.Sum(s => s.NbEpisodes ?? 0)
                 })
                 .ToList();
+        }
+
+        public bool UpdateSerie(int id, SerieDetailDto serieDto)
+        {
+            var serie = _context.Series
+                .FirstOrDefault(s => s.SerieId == id);
+
+            if (serie == null)
+                return false;
+
+            serie.Titre = serieDto.Titre;
+            serie.Resume = serieDto.Resume;
+            serie.NbSaisons = serieDto.NbSaisons;
+            serie.NbEpisodes = serieDto.NbEpisodes;
+            serie.AnneeCreation = serieDto.AnneeCreation;
+            serie.Network = serieDto.Network;
+
+            _context.SaveChanges();
+
+            return true;
         }
     }
 }
